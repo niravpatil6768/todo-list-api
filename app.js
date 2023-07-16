@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require('mongoose');
 const bodyparser = require('body-parser');
 
+
 //middleware
 
 app.use(bodyparser.urlencoded({extended: false}));
@@ -10,16 +11,70 @@ app.use(bodyparser.json());
 
 //const User = require('./api/models/users');
 
-app.use((req, res, next) => {  
+/*app.use((req, res, next) => {  
     res.header("Access-Control-Allow-Origin", '*');
     res.header('Access-Control-Allow-Headers',
      'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+
+     res.header(
+        'Access-Control-Expose-Headers',
+        'x-access-token, x-refresh-token'
+     );
+
      if(req.method === 'OPTIONS') {
        res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
        return res.status(200).json({});
      }
      next();
-});
+});*/
+
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept, Authorization, x-access-token, _id"
+    );
+    res.header(
+      "Access-Control-Expose-Headers",
+      "x-access-token, x-refresh-token"
+    );
+  
+    if (req.method === "OPTIONS") {
+      res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
+      return res.status(200).json({});
+    }
+    next();
+  });
+  
+  // Add a middleware to handle CORS errors
+  app.use((err, req, res, next) => {
+    if (err.name === "UnauthorizedError") {
+      res.status(401).json({ error: "Unauthorized" });
+    } else {
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+  
+
+const jwt = require('jsonwebtoken');
+
+// check whether the request has a valid JWT access token
+/*let authenticate = (req, res, next) => {
+    let token = req.header('x-access-token');
+
+    // verify the JWT
+    jwt.verify(token, User.getJWTSecret(), (err, decoded) => {
+        if (err) {
+            // there was an error
+            // jwt is invalid - * DO NOT AUTHENTICATE *
+            res.status(401).send(err);
+        } else {
+            // jwt is valid
+            req.user_id = decoded._id;
+            next();
+        }
+    });
+}*/
 
 //verify refresh token middleware(which will be verify the session)
 /*let verifySession = (req, res, next) => {

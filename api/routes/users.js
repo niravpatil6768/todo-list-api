@@ -8,6 +8,23 @@ const bcrypt = require('bcryptjs');
 //import user from models
 const User = require('../models/users');
 
+
+router.use((req, res, next) => {  
+    res.header("Access-Control-Allow-Origin", '*');
+    res.header('Access-Control-Allow-Headers',
+     'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+
+     res.header(
+        'Access-Control-Expose-Headers',
+        'x-access-token, x-refresh-token'
+     );
+
+     if(req.method === 'OPTIONS') {
+       res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
+       return res.status(200).json({});
+     }
+     next();
+});
 /*router.post('/', (req, res, next) => {
     User.find({
         email: req.body.email
@@ -20,7 +37,6 @@ const User = require('../models/users');
         }else{
             bcrypt.hash(req.body.password, 10, (err, hash) => {
                 if (err){
-                    console.log(err);
                     return res.status(500).json({
                         error: err
                     });
@@ -33,14 +49,11 @@ const User = require('../models/users');
                     });
                     user.save()
                     .then(result => {
-                        console.log(result);
                         res.status(201).json({
                             message: 'User created',
-                           console
                         });
                     })
                     .catch(err => {
-                        console.log(err);
                         res.status(500).json({
                             error : err
                         });
@@ -82,7 +95,6 @@ router.post('/login',(req, res, next) => {
         });
     })
     .catch(err => {
-        console.log(err);
         res.status(500).json({
             error : err
         });
@@ -122,7 +134,6 @@ let verifySession = (req, res, next) => {
         if(isSessionValid){
             //the session is valid - call next() to continue with processing this web request
             next();
-            console.log('successfully');
         }else{
             //the session is not valid
             return Promise.reject({
@@ -156,7 +167,6 @@ router.post('/', (req, res, next) => {
     .send(newUser);
 }).catch((e) => {
     res.status(400).send(e);
-    console.log(e);
 })
    
 });

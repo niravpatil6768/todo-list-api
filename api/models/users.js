@@ -18,7 +18,7 @@ const userSchema = mongoose.Schema({
             type: String,
             required: true
         },
-        expireAt: {
+        expiresAt: {
             type: Number,
             required: true
         }
@@ -76,6 +76,10 @@ userSchema.statics.getJWTSecret = () => {
 }
 
 //model methos(static methods)
+
+userSchema.statics.getJWTSecret = () => {
+    return jwtSecret;
+}
 userSchema.statics.findByIdAndToken = function(_id, token){
     //find user by id and token
     //used in auth middleware (varifysession)
